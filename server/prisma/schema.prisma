@@ -1,0 +1,109 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String     @id @default(uuid())
+  name         String?
+  email        String     @unique
+  passwordHash String
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  workflows    Workflow[]
+  refreshTokens RefreshToken[]
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Workflow {
+  id           String         @id @default(uuid())
+  userId       String
+  name         String
+  description  String?
+  status       String         @default("draft")
+  webhookToken String?        @unique
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  nodes        WorkflowNode[]
+  edges        WorkflowEdge[]
+  executions   Execution[]
+  schedules    Schedule[]
+}
+
+model WorkflowNode {
+  id         String   @id @default(uuid())
+  workflowId String
+  type       String
+  positionX  Float
+  positionY  Float
+  config     Json     @default("{}")
+
+  workflow   Workflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  logs       ExecutionLog[]
+}
+
+model WorkflowEdge {
+  id             String   @id @default(uuid())
+  workflowId     String
+  sourceNode     String
+  targetNode     String
+  conditionLabel String?
+
+  workflow       Workflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+}
+
+model Execution {
+  id            String         @id @default(uuid())
+  workflowId    String
+  status        String         @default("pending")
+  triggerData   Json?
+  outputData    Json?
+  triggeredBy   String         @default("manual")
+  startedAt     DateTime?
+  completedAt   DateTime?
+  executionTime Int?
+  createdAt     DateTime       @default(now())
+
+  workflow      Workflow       @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  logs          ExecutionLog[]
+}
+
+model ExecutionLog {
+  id          String   @id @default(uuid())
+  executionId String
+  nodeId      String?
+  level       String   @default("info")
+  message     String
+  timestamp   DateTime @default(now())
+
+  execution   Execution @relation(fields: [executionId], references: [id], onDelete: Cascade)
+  node        WorkflowNode? @relation(fields: [nodeId], references: [id])
+}
+
+model Schedule {
+  id             String   @id @default(uuid())
+  workflowId     String
+  cronExpression String
+  isActive       Boolean  @default(true)
+  lastRunAt      DateTime?
+  nextRunAt      DateTime?
+  createdAt      DateTime @default(now())
+
+  workflow       Workflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+}

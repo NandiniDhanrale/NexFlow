@@ -1,0 +1,69 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.react-flow__node {
+  padding: 0;
+  border-radius: 8px;
+}
+
+.react-flow__node.selected .node-container {
+  box-shadow: 0 0 0 2px theme('colors.primary.500');
+}
+
+.react-flow__edge-path {
+  stroke: theme('colors.primary.500');
+  stroke-width: 2;
+}
+
+.react-flow__edge.selected .react-flow__edge-path {
+  stroke: theme('colors.primary.400');
+}
+
+.react-flow__handle {
+  background: theme('colors.primary.500');
+  width: 10px;
+  height: 10px;
+}
+
+.react-flow__controls button {
+  background: theme('colors.gray.800');
+  border: 1px solid theme('colors.gray.700');
+  color: theme('colors.gray.100');
+  fill: theme('colors.gray.100');
+}
+
+.react-flow__minimap {
+  background: theme('colors.gray.950');
+}
+
+.react-flow__background {
+  background: theme('colors.gray.950');
+}
+
+.react-flow__attribution {
+  display: none;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: theme('colors.gray.900');
+}
+
+::-webkit-scrollbar-thumb {
+  background: theme('colors.gray.600');
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: theme('colors.gray.500');
+}
